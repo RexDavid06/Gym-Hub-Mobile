@@ -16,7 +16,16 @@ export function setRefreshHandler(handler: (() => Promise<string | null>) | null
   refreshAccessToken = handler
 }
 
-export async function apiFetch<TResponse, TBody = never>(
+export function buildApiPath(
+  template: ApiPath,
+  params: Record<string, string | number>,
+): ApiPath {
+  return template.replace(/\{([^}]+)\}/g, (_, key: string) =>
+    encodeURIComponent(String(params[key])),
+  ) as ApiPath
+}
+
+export async function apiFetch<TResponse, TBody = unknown>(
   path: ApiPath,
   method: ApiMethod,
   body?: TBody,

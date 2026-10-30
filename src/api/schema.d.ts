@@ -253,6 +253,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/workout-plans/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["workout_plans_list"];
+        put?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        post: operations["workout_plans_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/workout-plans/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["workout_plans_retrieve"];
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        put: operations["workout_plans_update"];
+        post?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        delete: operations["workout_plans_destroy"];
+        options?: never;
+        head?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        patch: operations["workout_plans_partial_update"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -309,6 +347,20 @@ export interface components {
             member: components["schemas"]["UserSummary"];
             trainer: components["schemas"]["UserSummary"] | null;
         };
+        PatchedWorkoutPlan: {
+            readonly id?: number;
+            readonly member?: components["schemas"]["UserSummary"];
+            member_id?: number;
+            readonly trainer?: components["schemas"]["UserSummary"];
+            title?: string;
+            notes?: string;
+            status?: components["schemas"]["StatusEnum"];
+            exercises?: components["schemas"]["WorkoutExercise"][];
+            /** Format: date-time */
+            readonly created_at?: string;
+            /** Format: date-time */
+            readonly updated_at?: string;
+        };
         PhoneToken: {
             phone: string;
             password: string;
@@ -342,6 +394,13 @@ export interface components {
         StaffPermissionSet: {
             codes: components["schemas"]["CodesEnum"][];
         };
+        /**
+         * @description * `draft` - Draft
+         *     * `active` - Active
+         *     * `archived` - Archived
+         * @enum {string}
+         */
+        StatusEnum: "draft" | "active" | "archived";
         TokenPair: {
             refresh: string;
             access: string;
@@ -380,6 +439,31 @@ export interface components {
             readonly id: number;
             name?: string;
             phone: string;
+        };
+        WorkoutExercise: {
+            readonly id: number;
+            name: string;
+            /** Format: int64 */
+            sets?: number;
+            reps?: string;
+            weight?: string;
+            notes?: string;
+            /** Format: int64 */
+            order?: number;
+        };
+        WorkoutPlan: {
+            readonly id: number;
+            readonly member: components["schemas"]["UserSummary"];
+            member_id?: number;
+            readonly trainer: components["schemas"]["UserSummary"];
+            title: string;
+            notes?: string;
+            status?: components["schemas"]["StatusEnum"];
+            exercises?: components["schemas"]["WorkoutExercise"][];
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
     };
     responses: never;
@@ -783,6 +867,147 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserList"];
+                };
+            };
+        };
+    };
+    workout_plans_list: {
+        parameters: {
+            query?: {
+                member?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkoutPlan"][];
+                };
+            };
+        };
+    };
+    workout_plans_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkoutPlan"];
+                "application/x-www-form-urlencoded": components["schemas"]["WorkoutPlan"];
+                "multipart/form-data": components["schemas"]["WorkoutPlan"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkoutPlan"];
+                };
+            };
+        };
+    };
+    workout_plans_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkoutPlan"];
+                };
+            };
+        };
+    };
+    workout_plans_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkoutPlan"];
+                "application/x-www-form-urlencoded": components["schemas"]["WorkoutPlan"];
+                "multipart/form-data": components["schemas"]["WorkoutPlan"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkoutPlan"];
+                };
+            };
+        };
+    };
+    workout_plans_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    workout_plans_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedWorkoutPlan"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedWorkoutPlan"];
+                "multipart/form-data": components["schemas"]["PatchedWorkoutPlan"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkoutPlan"];
                 };
             };
         };
