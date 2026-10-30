@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -12,8 +12,14 @@ import {
   View,
 } from 'react-native'
 
+import { apiFetch } from './src/api/client'
+import type { components } from './src/api/schema'
 import { AuthProvider, useAuth } from './src/auth/AuthContext'
 import { theme } from './src/theme'
+
+type Profile = components['schemas']['Me']
+type TrainerMember = components['schemas']['UserList']
+type MemberTrainer = components['schemas']['MemberTrainer']
 
 export default function App() {
   return (
@@ -46,26 +52,7 @@ function AppContent() {
   }
 
   if (loading) return <LoadingScreen label="Restoring your session…" />
-  if (profile) {
-    const role = profile.role
-    const title = role === 'trainer' ? 'Trainer home' : role === 'member' ? 'Member home' : 'Gym Hub Web'
-    const message =
-      role === 'trainer' || role === 'member'
-        ? `Welcome, ${profile.phone}.`
-        : 'Owners and admins can manage their gym from the Gym Hub web dashboard.'
-    return (
-      <Screen>
-        <Card>
-          <Brand />
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.copy}>{message}</Text>
-          <Text style={styles.gymName}>{profile.gym?.name ?? 'Gym not assigned'}</Text>
-          <Text style={styles.role}>Signed in as {role}</Text>
-          <ActionButton label="Log out" onPress={() => void logout()} />
-        </Card>
-      </Screen>
-    )
-  }
+  if (profile) return <RoleHome profile={profile} onLogout={logout} />
 
   return (
     <Screen>
@@ -105,6 +92,143 @@ function AppContent() {
         )}
       </Card>
     </Screen>
+  )
+}
+
+function RoleHome({ profile, onLogout }: { profile: Profile; onLogout: () => Promise<void> }) {
+  if (profile.role === 'trainer') return <TrainerHome profile={profile} onLogout={onLogout} />
+  if (profile.role === 'member') return <MemberHome profile={profile} onLogout={onLogout} />
+  return <StaffHome profile={profile} onLogout={onLogout} />
+}
+
+function StaffHome({ profile, onLogout }: { profile: Profile; onLogout: () => Promise<void> }) {
+  return (
+    <Screen>
+      <Card>
+        <Brand />
+        <Text style={styles.title}>Gym Hub Web</Text>
+        <Text style={styles.copy}>Welcome, {profile.name || profile.phone}.</Text>
+        <Text style={styles.gymName}>{profile.gym?.name ?? 'Gym not assigned'}</Text>
+        <Text style={styles.hint}>
+          Owners and admins can manage their gym from the Gym Hub web dashboard.
+        </Text>
+        <Text style={styles.role}>Signed in as {profile.role}</Text>
+        <ActionButton label="Log out" onPress={() => void onLogout()} />
+      </Card>
+    </Screen>
+  )
+}
+
+function TrainerHome({ profile, onLogout }: { profile: Profile; onLogout: () => Promise<void> }) {
+  const [members, setMembers] = useState<TrainerMember[] | null>(null)
+  const [error, setError] = useState('')
+
+  const load = useCallback(async () => {
+    setMembers(null)
+    setError('')
+    try {
+      setMembers(await apiFetch<TrainerMember[]>('/api/me/members/', 'get'))
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Unable to load your members.')
+    }
+  }, [])
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  return (
+    <Screen>
+      <Card>
+        <Brand />
+        <Text style={styles.title}>Trainer home</Text>
+        <Text style={styles.copy}>Welcome, {profile.name || profile.phone}.</Text>
+        <Text style={styles.gymName}>{profile.gym?.name ?? 'Gym not assigned'}</Text>
+        <Text style={styles.sectionLabel}>Assigned members</Text>
+        {members === null && !error ? <LoadingBlock label="Loading your members…" /> : null}
+        {error ? (
+          <>
+            <ErrorText>{error}</ErrorText>
+            <ActionButton label="Try again" onPress={() => void load()} />
+          </>
+        ) : null}
+        {members !== null && members.length === 0 ? (
+          <Text style={styles.hint}>
+            No members are assigned to you yet. Your gym admin can assign members from the web
+            dashboard.
+          </Text>
+        ) : null}
+        {members?.map((member) => (
+          <View key={member.id} style={styles.memberRow}>
+            <Text style={styles.memberName}>{member.name || 'Unnamed member'}</Text>
+            <Text style={styles.memberMeta}>{member.phone}</Text>
+          </View>
+        ))}
+        <ActionButton label="Log out" onPress={() => void onLogout()} />
+      </Card>
+    </Screen>
+  )
+}
+
+function MemberHome({ profile, onLogout }: { profile: Profile; onLogout: () => Promise<void> }) {
+  const [assignment, setAssignment] = useState<MemberTrainer | null>(null)
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState('')
+
+  const load = useCallback(async () => {
+    setLoaded(false)
+    setError('')
+    try {
+      setAssignment(await apiFetch<MemberTrainer>('/api/me/trainer/', 'get'))
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Unable to load your trainer.')
+    } finally {
+      setLoaded(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  return (
+    <Screen>
+      <Card>
+        <Brand />
+        <Text style={styles.title}>Member home</Text>
+        <Text style={styles.copy}>Welcome, {profile.name || profile.phone}.</Text>
+        <Text style={styles.gymName}>{profile.gym?.name ?? 'Gym not assigned'}</Text>
+        <Text style={styles.sectionLabel}>Your trainer</Text>
+        {!loaded && !error ? <LoadingBlock label="Loading your trainer…" /> : null}
+        {error ? (
+          <>
+            <ErrorText>{error}</ErrorText>
+            <ActionButton label="Try again" onPress={() => void load()} />
+          </>
+        ) : null}
+        {loaded && !error && !assignment?.trainer ? (
+          <Text style={styles.hint}>
+            No trainer is assigned to you yet. Your gym admin will assign one.
+          </Text>
+        ) : null}
+        {assignment?.trainer ? (
+          <View style={styles.memberRow}>
+            <Text style={styles.memberName}>{assignment.trainer.name || 'Your trainer'}</Text>
+            <Text style={styles.memberMeta}>{assignment.trainer.phone}</Text>
+          </View>
+        ) : null}
+        <ActionButton label="Log out" onPress={() => void onLogout()} />
+      </Card>
+    </Screen>
+  )
+}
+
+function LoadingBlock({ label }: { label: string }) {
+  return (
+    <View style={styles.loadingBlock}>
+      <ActivityIndicator color={theme.colors.navy} />
+      <Text style={styles.hint}>{label}</Text>
+    </View>
   )
 }
 
@@ -195,6 +319,11 @@ const styles = StyleSheet.create({
   linkText: { color: theme.colors.navyLight, fontSize: 15, fontWeight: '600' },
   error: { marginTop: 16, color: theme.colors.danger, fontSize: 14 },
   hint: { marginTop: 14, color: theme.colors.muted, fontSize: 13, lineHeight: 19 },
+  sectionLabel: { marginTop: 22, marginBottom: 10, color: theme.colors.navy, fontSize: 14, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8 },
+  loadingBlock: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12 },
+  memberRow: { marginTop: 8, padding: 14, borderRadius: 10, borderWidth: 1, borderColor: theme.colors.border, backgroundColor: theme.colors.background },
+  memberName: { color: theme.colors.text, fontSize: 16, fontWeight: '600' },
+  memberMeta: { marginTop: 3, color: theme.colors.muted, fontSize: 14 },
   gymName: { color: theme.colors.navyLight, fontSize: 18, fontWeight: '600' },
   role: { marginTop: 8, color: theme.colors.muted, fontSize: 14, textTransform: 'capitalize' },
 })

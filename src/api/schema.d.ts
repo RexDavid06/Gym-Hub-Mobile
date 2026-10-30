@@ -116,6 +116,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/members/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["me_members_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/trainer/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["me_trainer_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/members/{user_id}/trainer/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["members_trainer_retrieve"];
+        put: operations["members_trainer_update"];
+        post?: never;
+        delete: operations["members_trainer_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/token/": {
         parameters: {
             query?: never;
@@ -150,6 +198,22 @@ export interface paths {
          *     token if the refresh token is valid.
          */
         post: operations["token_refresh_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trainers/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["trainers_list"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -235,10 +299,15 @@ export interface components {
         };
         Me: {
             id: number;
+            name: string;
             phone: string;
             role: string;
             readonly gym: components["schemas"]["GymSummary"] | null;
             readonly permission_codes: string[];
+        };
+        MemberTrainer: {
+            member: components["schemas"]["UserSummary"];
+            trainer: components["schemas"]["UserSummary"] | null;
         };
         PhoneToken: {
             phone: string;
@@ -283,6 +352,9 @@ export interface components {
         TokenRefreshResponse: {
             access: string;
         };
+        TrainerAssignmentInput: {
+            trainer_id: number | null;
+        };
         UserList: {
             readonly id: number;
             name?: string;
@@ -293,6 +365,7 @@ export interface components {
             /** Format: date-time */
             readonly date_joined: string;
             readonly permission_codes: string[];
+            readonly assigned_trainer: components["schemas"]["UserSummary"] | null;
         };
         /**
          * @description * `super_admin` - Super admin
@@ -303,6 +376,11 @@ export interface components {
          * @enum {string}
          */
         UserListRoleEnum: "super_admin" | "owner" | "admin" | "trainer" | "member";
+        UserSummary: {
+            readonly id: number;
+            name?: string;
+            phone: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -492,6 +570,112 @@ export interface operations {
             };
         };
     };
+    me_members_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserList"][];
+                };
+            };
+        };
+    };
+    me_trainer_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberTrainer"];
+                };
+            };
+        };
+    };
+    members_trainer_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberTrainer"];
+                };
+            };
+        };
+    };
+    members_trainer_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrainerAssignmentInput"];
+                "application/x-www-form-urlencoded": components["schemas"]["TrainerAssignmentInput"];
+                "multipart/form-data": components["schemas"]["TrainerAssignmentInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberTrainer"];
+                };
+            };
+        };
+    };
+    members_trainer_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     token_create: {
         parameters: {
             query?: never;
@@ -538,6 +722,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TokenRefreshResponse"];
+                };
+            };
+        };
+    };
+    trainers_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSummary"][];
                 };
             };
         };

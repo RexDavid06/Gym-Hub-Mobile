@@ -14,4 +14,5 @@ Run checks with `npm run lint` and `npx tsc --noEmit`. API types are generated f
 the committed `schema.yml`; do not hand-write endpoint types. Tokens are stored
 with Expo SecureStore. The redeem and `/api/me/` responses currently omit the
 invitee's name and the API has no invite preview operation, so the app cannot
-show that name before redemption. The profile currently greets users by phone.
+show that name before redemption. After sign-in, trainers see their assigned
+members and members see their assigned trainer.
