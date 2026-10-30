@@ -34,6 +34,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       )
       setAccessToken(result.access)
       await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, result.access)
+      if (result.refresh) {
+        await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, result.refresh)
+      }
       return result.access
     } catch {
       await clearTokens()
@@ -113,6 +116,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 
   const logout = useCallback(async () => {
+    const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY)
+    if (refreshToken) {
+      try {
+        await apiFetch<undefined, { refresh: string }>(
+          '/api/auth/logout/',
+          'post',
+          { refresh: refreshToken },
+          false,
+        )
+      } catch {
+        // The token may already be expired or revoked; signing out locally still applies.
+      }
+    }
     await clearTokens()
     setProfile(null)
   }, [])

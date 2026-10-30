@@ -8,6 +8,7 @@
     "start": "expo start",
     "gen:api": "openapi-typescript ./schema.yml -o src/api/schema.d.ts",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write ."
   },
   "dependencies": {

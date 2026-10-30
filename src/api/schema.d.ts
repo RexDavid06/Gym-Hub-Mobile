@@ -52,6 +52,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/logout/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Revoke a refresh token so it can no longer be rotated or exchanged. */
+        post: operations["auth_logout_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/redeem-invite/": {
         parameters: {
             query?: never;
@@ -132,6 +149,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/membership/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["me_membership_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/trainer/": {
         parameters: {
             query?: never;
@@ -159,6 +192,165 @@ export interface paths {
         put: operations["members_trainer_update"];
         post?: never;
         delete: operations["members_trainer_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/membership-payments/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["membership_payments_list"];
+        put?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        post: operations["membership_payments_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/membership-payments/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["membership_payments_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/membership-payments/{id}/void/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Void a payment. Payments are never edited or deleted. */
+        post: operations["membership_payments_void_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/membership-plans/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["membership_plans_list"];
+        put?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        post: operations["membership_plans_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/membership-plans/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["membership_plans_retrieve"];
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        put: operations["membership_plans_update"];
+        post?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        delete: operations["membership_plans_destroy"];
+        options?: never;
+        head?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        patch: operations["membership_plans_partial_update"];
+        trace?: never;
+    };
+    "/api/memberships/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["memberships_list"];
+        put?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        post: operations["memberships_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/memberships/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["memberships_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/memberships/{id}/cancel/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        post: operations["memberships_cancel_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/memberships/{id}/renew/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        post: operations["memberships_renew_create"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -309,7 +501,7 @@ export interface components {
             name: string;
         };
         InviteCreate: {
-            role: components["schemas"]["Role264Enum"];
+            role: components["schemas"]["InviteRoleEnum"];
             phone: string;
             name: string;
         };
@@ -324,7 +516,7 @@ export interface components {
         };
         InviteList: {
             readonly id: number;
-            role: components["schemas"]["Role264Enum"];
+            role: components["schemas"]["InviteRoleEnum"];
             phone: string;
             name: string;
             /** Format: date-time */
@@ -334,6 +526,16 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string;
             readonly created_by: number;
+        };
+        /**
+         * @description * `admin` - Admin
+         *     * `trainer` - Trainer
+         *     * `member` - Member
+         * @enum {string}
+         */
+        InviteRoleEnum: "admin" | "trainer" | "member";
+        Logout: {
+            refresh: string;
         };
         Me: {
             id: number;
@@ -347,6 +549,95 @@ export interface components {
             member: components["schemas"]["UserSummary"];
             trainer: components["schemas"]["UserSummary"] | null;
         };
+        MembershipPayment: {
+            readonly id: number;
+            readonly member: components["schemas"]["UserSummary"];
+            member_id: number;
+            readonly subscription: number;
+            subscription_id?: number | null;
+            /** Format: decimal */
+            amount?: string;
+            method?: components["schemas"]["MethodEnum"];
+            reference?: string;
+            /** Format: date */
+            paid_at?: string;
+            notes?: string;
+            readonly receipt_number: string;
+            readonly recorded_by: number;
+            /** Format: date-time */
+            readonly voided_at: string | null;
+            readonly voided_by: number | null;
+            readonly void_reason: string;
+            readonly is_voided: boolean;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        MembershipPlan: {
+            readonly id: number;
+            name: string;
+            description?: string;
+            /** Format: decimal */
+            price: string;
+            /** Format: int64 */
+            duration_days: number;
+            is_active?: boolean;
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
+        };
+        MembershipSubscription: {
+            readonly id: number;
+            readonly member: components["schemas"]["UserSummary"];
+            member_id: number;
+            readonly plan: components["schemas"]["MembershipPlan"];
+            plan_id: number;
+            readonly status: components["schemas"]["MembershipSubscriptionStatusEnum"];
+            /** Format: date */
+            start_date?: string;
+            /** Format: date */
+            readonly end_date: string;
+            /** Format: decimal */
+            readonly price: string;
+            readonly days_left: number;
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
+        };
+        /**
+         * @description * `active` - Active
+         *     * `expired` - Expired
+         *     * `cancelled` - Cancelled
+         * @enum {string}
+         */
+        MembershipSubscriptionStatusEnum: "active" | "expired" | "cancelled";
+        /**
+         * @description * `cash` - Cash
+         *     * `transfer` - Bank transfer
+         *     * `pos` - POS
+         *     * `other` - Other
+         * @enum {string}
+         */
+        MethodEnum: "cash" | "transfer" | "pos" | "other";
+        MyMembership: {
+            subscription: components["schemas"]["MembershipSubscription"] | null;
+            payments: components["schemas"]["MembershipPayment"][];
+        };
+        PatchedMembershipPlan: {
+            readonly id?: number;
+            name?: string;
+            description?: string;
+            /** Format: decimal */
+            price?: string;
+            /** Format: int64 */
+            duration_days?: number;
+            is_active?: boolean;
+            /** Format: date-time */
+            readonly created_at?: string;
+            /** Format: date-time */
+            readonly updated_at?: string;
+        };
         PatchedWorkoutPlan: {
             readonly id?: number;
             readonly member?: components["schemas"]["UserSummary"];
@@ -354,7 +645,7 @@ export interface components {
             readonly trainer?: components["schemas"]["UserSummary"];
             title?: string;
             notes?: string;
-            status?: components["schemas"]["StatusEnum"];
+            status?: components["schemas"]["WorkoutPlanStatusEnum"];
             exercises?: components["schemas"]["WorkoutExercise"][];
             /** Format: date-time */
             readonly created_at?: string;
@@ -384,23 +675,12 @@ export interface components {
             user_id: number;
             role: string;
         };
-        /**
-         * @description * `admin` - Admin
-         *     * `trainer` - Trainer
-         *     * `member` - Member
-         * @enum {string}
-         */
-        Role264Enum: "admin" | "trainer" | "member";
+        RenewMembership: {
+            plan_id?: number;
+        };
         StaffPermissionSet: {
             codes: components["schemas"]["CodesEnum"][];
         };
-        /**
-         * @description * `draft` - Draft
-         *     * `active` - Active
-         *     * `archived` - Archived
-         * @enum {string}
-         */
-        StatusEnum: "draft" | "active" | "archived";
         TokenPair: {
             refresh: string;
             access: string;
@@ -410,6 +690,7 @@ export interface components {
         };
         TokenRefreshResponse: {
             access: string;
+            refresh?: string;
         };
         TrainerAssignmentInput: {
             trainer_id: number | null;
@@ -418,7 +699,7 @@ export interface components {
             readonly id: number;
             name?: string;
             phone: string;
-            role?: components["schemas"]["UserListRoleEnum"];
+            role?: components["schemas"]["UserRoleEnum"];
             gym?: number | null;
             is_active?: boolean;
             /** Format: date-time */
@@ -434,11 +715,14 @@ export interface components {
          *     * `member` - Member
          * @enum {string}
          */
-        UserListRoleEnum: "super_admin" | "owner" | "admin" | "trainer" | "member";
+        UserRoleEnum: "super_admin" | "owner" | "admin" | "trainer" | "member";
         UserSummary: {
             readonly id: number;
             name?: string;
             phone: string;
+        };
+        VoidPayment: {
+            reason: string;
         };
         WorkoutExercise: {
             readonly id: number;
@@ -458,13 +742,20 @@ export interface components {
             readonly trainer: components["schemas"]["UserSummary"];
             title: string;
             notes?: string;
-            status?: components["schemas"]["StatusEnum"];
+            status?: components["schemas"]["WorkoutPlanStatusEnum"];
             exercises?: components["schemas"]["WorkoutExercise"][];
             /** Format: date-time */
             readonly created_at: string;
             /** Format: date-time */
             readonly updated_at: string;
         };
+        /**
+         * @description * `draft` - Draft
+         *     * `active` - Active
+         *     * `archived` - Archived
+         * @enum {string}
+         */
+        WorkoutPlanStatusEnum: "draft" | "active" | "archived";
     };
     responses: never;
     parameters: never;
@@ -531,6 +822,30 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    auth_logout_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Logout"];
+                "application/x-www-form-urlencoded": components["schemas"]["Logout"];
+                "multipart/form-data": components["schemas"]["Logout"];
+            };
+        };
         responses: {
             /** @description No response body */
             204: {
@@ -673,6 +988,25 @@ export interface operations {
             };
         };
     };
+    me_membership_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyMembership"];
+                };
+            };
+        };
+    };
     me_trainer_retrieve: {
         parameters: {
             query?: never;
@@ -757,6 +1091,355 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    membership_payments_list: {
+        parameters: {
+            query?: {
+                member?: number;
+                subscription?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipPayment"][];
+                };
+            };
+        };
+    };
+    membership_payments_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MembershipPayment"];
+                "application/x-www-form-urlencoded": components["schemas"]["MembershipPayment"];
+                "multipart/form-data": components["schemas"]["MembershipPayment"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipPayment"];
+                };
+            };
+        };
+    };
+    membership_payments_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipPayment"];
+                };
+            };
+        };
+    };
+    membership_payments_void_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VoidPayment"];
+                "application/x-www-form-urlencoded": components["schemas"]["VoidPayment"];
+                "multipart/form-data": components["schemas"]["VoidPayment"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipPayment"];
+                };
+            };
+        };
+    };
+    membership_plans_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipPlan"][];
+                };
+            };
+        };
+    };
+    membership_plans_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MembershipPlan"];
+                "application/x-www-form-urlencoded": components["schemas"]["MembershipPlan"];
+                "multipart/form-data": components["schemas"]["MembershipPlan"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipPlan"];
+                };
+            };
+        };
+    };
+    membership_plans_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipPlan"];
+                };
+            };
+        };
+    };
+    membership_plans_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MembershipPlan"];
+                "application/x-www-form-urlencoded": components["schemas"]["MembershipPlan"];
+                "multipart/form-data": components["schemas"]["MembershipPlan"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipPlan"];
+                };
+            };
+        };
+    };
+    membership_plans_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    membership_plans_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedMembershipPlan"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedMembershipPlan"];
+                "multipart/form-data": components["schemas"]["PatchedMembershipPlan"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipPlan"];
+                };
+            };
+        };
+    };
+    memberships_list: {
+        parameters: {
+            query?: {
+                member?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipSubscription"][];
+                };
+            };
+        };
+    };
+    memberships_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MembershipSubscription"];
+                "application/x-www-form-urlencoded": components["schemas"]["MembershipSubscription"];
+                "multipart/form-data": components["schemas"]["MembershipSubscription"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipSubscription"];
+                };
+            };
+        };
+    };
+    memberships_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipSubscription"];
+                };
+            };
+        };
+    };
+    memberships_cancel_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipSubscription"];
+                };
+            };
+        };
+    };
+    memberships_renew_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RenewMembership"];
+                "application/x-www-form-urlencoded": components["schemas"]["RenewMembership"];
+                "multipart/form-data": components["schemas"]["RenewMembership"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipSubscription"];
+                };
             };
         };
     };

@@ -38,6 +38,10 @@ export async function apiFetch<TResponse, TBody = unknown>(
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+  }).catch(() => {
+    throw new Error(
+      'Cannot reach Gym Hub right now. Check your internet connection and try again.',
+    )
   })
 
   if (response.status === 401 && retryAfterRefresh && refreshAccessToken) {
