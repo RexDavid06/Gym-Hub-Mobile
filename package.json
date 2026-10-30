@@ -1,0 +1,32 @@
+{
+  "name": "gym-hub-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "gen:api": "openapi-typescript ./schema.yml -o src/api/schema.d.ts",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "expo": "~52.0.0",
+    "expo-asset": "~11.0.5",
+    "expo-secure-store": "~14.0.1",
+    "expo-status-bar": "~2.0.1",
+    "react": "18.3.1",
+    "react-native": "0.76.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@eslint/js": "^9.19.0",
+    "@types/react": "~18.3.12",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.5.3",
+    "openapi-typescript": "^7.8.0",
+    "typescript": "~5.7.3",
+    "typescript-eslint": "^8.24.0"
+  }
+}
