@@ -16,6 +16,7 @@ import {
 import { apiFetch, buildApiPath } from './src/api/client'
 import type { components } from './src/api/schema'
 import { AuthProvider, useAuth } from './src/auth/AuthContext'
+import { MemberMembershipSection } from './src/membership/MemberMembershipSection'
 import { theme } from './src/theme'
 
 type Profile = components['schemas']['Me']
@@ -587,6 +588,7 @@ function MemberHome({ profile, onLogout }: { profile: Profile; onLogout: () => P
             <Text style={styles.memberMeta}>{assignment.trainer.phone}</Text>
           </View>
         ) : null}
+        <MemberMembershipSection />
         <Text style={styles.sectionLabel}>Your workout plans</Text>
         {loaded && !error && plans?.length === 0 ? (
           <Text style={styles.hint}>No workout plans yet. Your trainer will add one soon.</Text>
