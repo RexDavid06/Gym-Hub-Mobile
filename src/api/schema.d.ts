@@ -1331,7 +1331,10 @@ export interface operations {
     memberships_list: {
         parameters: {
             query?: {
+                /** @description Active subscriptions ending within this many days. */
+                expiring_within?: number;
                 member?: number;
+                status?: "active" | "cancelled" | "expired";
             };
             header?: never;
             path?: never;
