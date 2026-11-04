@@ -101,6 +101,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/health/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Lightweight readiness probe: confirms the database answers a query. */
+        get: operations["health_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/invites/": {
         parameters: {
             query?: never;
@@ -356,6 +373,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/gyms/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["platform_gym_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/gyms/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["platform_gym_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["platform_gym_update"];
+        trace?: never;
+    };
+    "/api/platform/summary/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["platform_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/token/": {
         parameters: {
             query?: never;
@@ -421,6 +486,23 @@ export interface paths {
         };
         /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
         get: operations["users_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/{user_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["users_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -624,6 +706,13 @@ export interface components {
             subscription: components["schemas"]["MembershipSubscription"] | null;
             payments: components["schemas"]["MembershipPayment"][];
         };
+        /** @description The page-number paginated shape returned by the gym list endpoint. */
+        PaginatedPlatformGymList: {
+            count: number;
+            next: string | null;
+            previous: string | null;
+            results: components["schemas"]["PlatformGymList"][];
+        };
         PatchedMembershipPlan: {
             readonly id?: number;
             name?: string;
@@ -637,6 +726,11 @@ export interface components {
             readonly created_at?: string;
             /** Format: date-time */
             readonly updated_at?: string;
+        };
+        PatchedPlatformGymUpdate: {
+            is_active?: boolean;
+            plan_tier?: components["schemas"]["PlanTierEnum"];
+            suspension_reason?: string;
         };
         PatchedWorkoutPlan: {
             readonly id?: number;
@@ -655,6 +749,56 @@ export interface components {
         PhoneToken: {
             phone: string;
             password: string;
+        };
+        /**
+         * @description * `small` - Small
+         *     * `medium` - Medium
+         *     * `big` - Big
+         * @enum {string}
+         */
+        PlanTierEnum: "small" | "medium" | "big";
+        PlatformGymDetail: {
+            id: number;
+            name: string;
+            plan_tier: string;
+            is_active: boolean;
+            /** Format: date-time */
+            created_at: string;
+            owner: components["schemas"]["PlatformUserSummary"] | null;
+            member_count: number;
+            trainer_count: number;
+            admin_count: number;
+            active_membership_count: number;
+            expired_membership_count: number;
+            /** Format: date-time */
+            suspended_at: string | null;
+            suspended_by: components["schemas"]["PlatformUserSummary"] | null;
+            suspension_reason: string;
+        };
+        PlatformGymList: {
+            id: number;
+            name: string;
+            plan_tier: string;
+            is_active: boolean;
+            /** Format: date-time */
+            created_at: string;
+            owner: components["schemas"]["PlatformUserSummary"] | null;
+            member_count: number;
+            trainer_count: number;
+        };
+        PlatformSummary: {
+            gyms_total: number;
+            gyms_active: number;
+            gyms_suspended: number;
+            members_total: number;
+            trainers_total: number;
+            active_memberships: number;
+            memberships_expiring_7_days: number;
+        };
+        PlatformUserSummary: {
+            id: number;
+            name: string;
+            phone: string;
         };
         RedeemInvite: {
             code: string;
@@ -902,6 +1046,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RegisteredGym"];
+                };
+            };
+        };
+    };
+    health_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        status?: string;
+                    };
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        status?: string;
+                    };
                 };
             };
         };
@@ -1446,6 +1621,101 @@ export interface operations {
             };
         };
     };
+    platform_gym_list: {
+        parameters: {
+            query?: {
+                /** @description Filter by suspension state. */
+                is_active?: boolean;
+                page?: number;
+                /** @description Page size, default 20, maximum 100. */
+                page_size?: number;
+                plan_tier?: "big" | "medium" | "small";
+                /** @description Case-insensitive gym name match. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPlatformGymList"];
+                };
+            };
+        };
+    };
+    platform_gym_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformGymDetail"];
+                };
+            };
+        };
+    };
+    platform_gym_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedPlatformGymUpdate"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedPlatformGymUpdate"];
+                "multipart/form-data": components["schemas"]["PatchedPlatformGymUpdate"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformGymDetail"];
+                };
+            };
+        };
+    };
+    platform_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformSummary"];
+                };
+            };
+        };
+    };
     token_create: {
         parameters: {
             query?: never;
@@ -1532,6 +1802,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserList"][];
+                };
+            };
+        };
+    };
+    users_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserList"];
                 };
             };
         };
