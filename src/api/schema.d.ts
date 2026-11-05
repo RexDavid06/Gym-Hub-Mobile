@@ -101,6 +101,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/branches/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["branches_list"];
+        put?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        post: operations["branches_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/branches/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["branches_retrieve"];
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        put: operations["branches_update"];
+        post?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        delete: operations["branches_destroy"];
+        options?: never;
+        head?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        patch: operations["branches_partial_update"];
+        trace?: never;
+    };
     "/api/health/": {
         parameters: {
             query?: never;
@@ -511,6 +549,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/{user_id}/branch/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["users_branch_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/users/{user_id}/deactivate/": {
         parameters: {
             query?: never;
@@ -569,6 +623,15 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Branch: {
+            readonly id: number;
+            name: string;
+            address?: string;
+        };
+        BranchSummary: {
+            readonly id: number;
+            name: string;
+        };
         /**
          * @description * `manage_members` - manage_members
          *     * `manage_trainers` - manage_trainers
@@ -625,6 +688,7 @@ export interface components {
             phone: string;
             role: string;
             readonly gym: components["schemas"]["GymSummary"] | null;
+            readonly branch: components["schemas"]["BranchSummary"] | null;
             readonly permission_codes: string[];
         };
         MemberTrainer: {
@@ -712,6 +776,11 @@ export interface components {
             next: string | null;
             previous: string | null;
             results: components["schemas"]["PlatformGymList"][];
+        };
+        PatchedBranch: {
+            readonly id?: number;
+            name?: string;
+            address?: string;
         };
         PatchedMembershipPlan: {
             readonly id?: number;
@@ -839,12 +908,16 @@ export interface components {
         TrainerAssignmentInput: {
             trainer_id: number | null;
         };
+        UserBranchInput: {
+            branch_id: number | null;
+        };
         UserList: {
             readonly id: number;
             name?: string;
             phone: string;
             role?: components["schemas"]["UserRoleEnum"];
             gym?: number | null;
+            readonly branch: components["schemas"]["BranchSummary"];
             is_active?: boolean;
             /** Format: date-time */
             readonly date_joined: string;
@@ -1046,6 +1119,145 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RegisteredGym"];
+                };
+            };
+        };
+    };
+    branches_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Branch"][];
+                };
+            };
+        };
+    };
+    branches_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Branch"];
+                "application/x-www-form-urlencoded": components["schemas"]["Branch"];
+                "multipart/form-data": components["schemas"]["Branch"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Branch"];
+                };
+            };
+        };
+    };
+    branches_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Branch"];
+                };
+            };
+        };
+    };
+    branches_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Branch"];
+                "application/x-www-form-urlencoded": components["schemas"]["Branch"];
+                "multipart/form-data": components["schemas"]["Branch"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Branch"];
+                };
+            };
+        };
+    };
+    branches_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    branches_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedBranch"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedBranch"];
+                "multipart/form-data": components["schemas"]["PatchedBranch"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Branch"];
                 };
             };
         };
@@ -1816,6 +2028,33 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserList"];
+                };
+            };
+        };
+    };
+    users_branch_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserBranchInput"];
+                "application/x-www-form-urlencoded": components["schemas"]["UserBranchInput"];
+                "multipart/form-data": components["schemas"]["UserBranchInput"];
+            };
+        };
         responses: {
             200: {
                 headers: {

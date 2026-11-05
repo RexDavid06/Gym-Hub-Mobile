@@ -16,6 +16,7 @@ import {
 import { apiFetch, buildApiPath } from './src/api/client'
 import type { components } from './src/api/schema'
 import { AuthProvider, useAuth } from './src/auth/AuthContext'
+import { BranchLine } from './src/branch/BranchLine'
 import { MemberMembershipSection } from './src/membership/MemberMembershipSection'
 import { theme } from './src/theme'
 
@@ -116,6 +117,7 @@ function StaffHome({ profile, onLogout }: { profile: Profile; onLogout: () => Pr
         <Text style={styles.title}>Gym Hub Web</Text>
         <Text style={styles.copy}>Welcome, {profile.name || profile.phone}.</Text>
         <Text style={styles.gymName}>{profile.gym?.name ?? 'Gym not assigned'}</Text>
+        <BranchLine branch={profile.branch} />
         <Text style={styles.hint}>
           Owners and admins can manage their gym from the Gym Hub web dashboard.
         </Text>
@@ -162,6 +164,7 @@ function TrainerHome({ profile, onLogout }: { profile: Profile; onLogout: () => 
         <Text style={styles.title}>Trainer home</Text>
         <Text style={styles.copy}>Welcome, {profile.name || profile.phone}.</Text>
         <Text style={styles.gymName}>{profile.gym?.name ?? 'Gym not assigned'}</Text>
+        <BranchLine branch={profile.branch} />
         <Text style={styles.sectionLabel}>Assigned members</Text>
         {members === null && !error ? <LoadingBlock label="Loading your members…" /> : null}
         {error ? (
@@ -185,7 +188,10 @@ function TrainerHome({ profile, onLogout }: { profile: Profile; onLogout: () => 
           >
             <View>
               <Text style={styles.memberName}>{member.name || 'Unnamed member'}</Text>
-              <Text style={styles.memberMeta}>{member.phone}</Text>
+              <Text style={styles.memberMeta}>
+                {member.phone}
+                {member.branch ? ` · ${member.branch.name}` : ''}
+              </Text>
             </View>
             <Text style={styles.memberChevron}>View plans ›</Text>
           </Pressable>
@@ -569,6 +575,7 @@ function MemberHome({ profile, onLogout }: { profile: Profile; onLogout: () => P
         <Text style={styles.title}>Member home</Text>
         <Text style={styles.copy}>Welcome, {profile.name || profile.phone}.</Text>
         <Text style={styles.gymName}>{profile.gym?.name ?? 'Gym not assigned'}</Text>
+        <BranchLine branch={profile.branch} />
         <Text style={styles.sectionLabel}>Your trainer</Text>
         {!loaded && !error ? <LoadingBlock label="Loading your home screen…" /> : null}
         {error ? (

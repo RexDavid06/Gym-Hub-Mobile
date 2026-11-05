@@ -13,7 +13,8 @@ Run checks from `mobile/`:
 
 ```sh
 npm run lint
-npx tsc --noEmit
+npm run typecheck
+npm run test:run
 ```
 
 ## Authentication
@@ -24,13 +25,15 @@ Login uses phone number and password. Invite redemption sets a password and sign
 
 ### Trainer
 
-- View assigned members.
+- View assigned members, including their branch.
+- View the trainer's own branch.
 - View, create, edit, and delete workout plans for assigned members.
 - Add, edit, and remove exercises in a workout plan.
 - Sign out.
 
 ### Member
 
+- View the member's own branch.
 - View the assigned trainer.
 - View workout plans.
 - View the current membership card and receipts.
@@ -39,7 +42,7 @@ Login uses phone number and password. Invite redemption sets a password and sign
 ## Current limitations
 
 - The API has no invite-preview operation, so the app cannot show an invitee's name before redemption. Redemption still works.
-- No automated mobile tests yet; lint and typecheck are the current checks.
+- Mobile tests currently cover branch display; broader screen coverage is still being built.
 - The shared `packages/api-client` package is not used; the app keeps its own generated schema and typed fetch wrapper.
 
 API types are generated from the committed `schema.yml`; do not hand-write endpoint types.
