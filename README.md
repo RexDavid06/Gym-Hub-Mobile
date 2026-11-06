@@ -39,6 +39,10 @@ Login uses phone number and password. Invite redemption sets a password and sign
 - View the current membership card and receipts.
 - Sign out.
 
+## Notifications
+
+Phase 8 delivers membership reminders and payment receipts by SMS or WhatsApp outside the app. There is no mobile notification inbox, push notification, or opt-in screen. WhatsApp consent is managed by gym staff on the web dashboard. Mobile screens and tests are unchanged by Phase 8.
+
 ## Current limitations
 
 - The API has no invite-preview operation, so the app cannot show an invitee's name before redemption. Redemption still works.

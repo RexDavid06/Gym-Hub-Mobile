@@ -411,6 +411,73 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/notification-settings/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["notification_settings_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["notification_settings_partial_update"];
+        trace?: never;
+    };
+    "/api/notifications/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["notifications_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        get: operations["notifications_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/{id}/retry/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Base viewset for tenant-owned models; subclasses inherit gym filtering. */
+        post: operations["notifications_retry_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/gyms/": {
         parameters: {
             query?: never;
@@ -581,6 +648,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/{user_id}/notification-preference/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["users_notification_preference_retrieve"];
+        put: operations["users_notification_preference_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/workout-plans/": {
         parameters: {
             query?: never;
@@ -633,6 +716,12 @@ export interface components {
             name: string;
         };
         /**
+         * @description * `sms` - SMS
+         *     * `whatsapp` - WhatsApp
+         * @enum {string}
+         */
+        ChannelEnum: "sms" | "whatsapp";
+        /**
          * @description * `manage_members` - manage_members
          *     * `manage_trainers` - manage_trainers
          *     * `manage_payments` - manage_payments
@@ -641,6 +730,13 @@ export interface components {
          * @enum {string}
          */
         CodesEnum: "manage_members" | "manage_trainers" | "manage_payments" | "assign_trainers" | "view_reports";
+        /**
+         * @description * `membership_expiring` - Membership expiring
+         *     * `membership_expired` - Membership expired
+         *     * `payment_receipt` - Payment receipt
+         * @enum {string}
+         */
+        EventEnum: "membership_expiring" | "membership_expired" | "payment_receipt";
         GymSummary: {
             id: number;
             name: string;
@@ -689,6 +785,7 @@ export interface components {
             role: string;
             readonly gym: components["schemas"]["GymSummary"] | null;
             readonly branch: components["schemas"]["BranchSummary"] | null;
+            readonly whatsapp_opt_in: boolean;
             readonly permission_codes: string[];
         };
         MemberTrainer: {
@@ -770,6 +867,71 @@ export interface components {
             subscription: components["schemas"]["MembershipSubscription"] | null;
             payments: components["schemas"]["MembershipPayment"][];
         };
+        Notification: {
+            readonly id: number;
+            readonly recipient: components["schemas"]["UserSummary"] | null;
+            readonly recipient_phone: string;
+            readonly event: components["schemas"]["EventEnum"];
+            readonly schedule_key: components["schemas"]["ScheduleKeyEnum"];
+            readonly channel: components["schemas"]["ChannelEnum"];
+            readonly status: components["schemas"]["NotificationStatusEnum"];
+            readonly payload: unknown;
+            readonly body: string;
+            readonly template_name: string;
+            readonly provider: string;
+            readonly provider_message_id: string;
+            readonly attempts: number;
+            readonly last_error: string;
+            readonly skip_reason: string;
+            /** Format: date-time */
+            readonly scheduled_at: string;
+            /** Format: date-time */
+            readonly sent_at: string | null;
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
+        };
+        NotificationPreference: {
+            whatsapp_opt_in: boolean;
+        };
+        NotificationSetting: {
+            readonly id: number;
+            sms_reminders_enabled?: boolean;
+            sms_receipts_enabled?: boolean;
+            whatsapp_reminders_enabled?: boolean;
+            whatsapp_receipts_enabled?: boolean;
+            readonly sms_available: boolean;
+            readonly whatsapp_available: boolean;
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
+        };
+        /**
+         * @description * `pending` - Pending
+         *     * `sending` - Sending
+         *     * `sent` - Sent
+         *     * `failed` - Failed
+         *     * `skipped` - Skipped
+         * @enum {string}
+         */
+        NotificationStatusEnum: "pending" | "sending" | "sent" | "failed" | "skipped";
+        PaginatedNotificationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Notification"][];
+        };
         /** @description The page-number paginated shape returned by the gym list endpoint. */
         PaginatedPlatformGymList: {
             count: number;
@@ -791,6 +953,19 @@ export interface components {
             /** Format: int64 */
             duration_days?: number;
             is_active?: boolean;
+            /** Format: date-time */
+            readonly created_at?: string;
+            /** Format: date-time */
+            readonly updated_at?: string;
+        };
+        PatchedNotificationSetting: {
+            readonly id?: number;
+            sms_reminders_enabled?: boolean;
+            sms_receipts_enabled?: boolean;
+            whatsapp_reminders_enabled?: boolean;
+            whatsapp_receipts_enabled?: boolean;
+            readonly sms_available?: boolean;
+            readonly whatsapp_available?: boolean;
             /** Format: date-time */
             readonly created_at?: string;
             /** Format: date-time */
@@ -891,6 +1066,17 @@ export interface components {
         RenewMembership: {
             plan_id?: number;
         };
+        /**
+         * @description * `3m` - Three months
+         *     * `1m` - One month
+         *     * `7d` - Seven days
+         *     * `3d` - Three days
+         *     * `due` - Due date
+         *     * `7d_after` - Seven days after
+         *     * `receipt` - Receipt
+         * @enum {string}
+         */
+        ScheduleKeyEnum: "3m" | "1m" | "7d" | "3d" | "due" | "7d_after" | "receipt";
         StaffPermissionSet: {
             codes: components["schemas"]["CodesEnum"][];
         };
@@ -923,6 +1109,7 @@ export interface components {
             readonly date_joined: string;
             readonly permission_codes: string[];
             readonly assigned_trainer: components["schemas"]["UserSummary"] | null;
+            readonly whatsapp_opt_in: boolean;
         };
         /**
          * @description * `super_admin` - Super admin
@@ -1833,6 +2020,120 @@ export interface operations {
             };
         };
     };
+    notification_settings_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationSetting"];
+                };
+            };
+        };
+    };
+    notification_settings_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedNotificationSetting"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedNotificationSetting"];
+                "multipart/form-data": components["schemas"]["PatchedNotificationSetting"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationSetting"];
+                };
+            };
+        };
+    };
+    notifications_list: {
+        parameters: {
+            query?: {
+                channel?: "sms" | "whatsapp";
+                event?: "membership_expired" | "membership_expiring" | "payment_receipt";
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                schedule_key?: "1m" | "3d" | "3m" | "7d" | "7d_after" | "due" | "receipt";
+                status?: "failed" | "pending" | "sending" | "sent" | "skipped";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedNotificationList"];
+                };
+            };
+        };
+    };
+    notifications_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notification"];
+                };
+            };
+        };
+    };
+    notifications_retry_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Notification"];
+                };
+            };
+        };
+    };
     platform_gym_list: {
         parameters: {
             query?: {
@@ -2083,6 +2384,54 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserList"];
+                };
+            };
+        };
+    };
+    users_notification_preference_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPreference"];
+                };
+            };
+        };
+    };
+    users_notification_preference_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NotificationPreference"];
+                "application/x-www-form-urlencoded": components["schemas"]["NotificationPreference"];
+                "multipart/form-data": components["schemas"]["NotificationPreference"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPreference"];
                 };
             };
         };
