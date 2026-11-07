@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
 
+import type { components } from '@gym-hub/api-client'
+
 import { apiFetch } from '../api/client'
-import type { components } from '../api/schema'
 import { theme } from '../theme'
 import { ReceiptsList } from './ReceiptsList'
 import { SubscriptionCard } from './SubscriptionCard'
@@ -18,7 +19,7 @@ export function MemberMembershipSection() {
     setLoading(true)
     setError('')
     try {
-      setMembership(await apiFetch<MyMembership>('/api/me/membership/', 'get'))
+      setMembership(await apiFetch('/api/me/membership/', 'get'))
     } catch (caught) {
       setError(
         caught instanceof Error

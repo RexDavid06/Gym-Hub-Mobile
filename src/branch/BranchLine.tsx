@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from 'react-native'
 
-import type { components } from '../api/schema'
+import type { components } from '@gym-hub/api-client'
 import { theme } from '../theme'
 
 type BranchSummary = components['schemas']['BranchSummary']

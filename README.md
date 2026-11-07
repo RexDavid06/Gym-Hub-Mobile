@@ -5,7 +5,6 @@ Expo and TypeScript app for trainers and members. Requires Node.js 20+, npm, and
 ```sh
 npm install
 cp .env.example .env
-npm run gen:api
 npx expo start
 ```
 
@@ -47,6 +46,5 @@ Phase 8 delivers membership reminders and payment receipts by SMS or WhatsApp ou
 
 - The API has no invite-preview operation, so the app cannot show an invitee's name before redemption. Redemption still works.
 - Mobile tests currently cover branch display; broader screen coverage is still being built.
-- The shared `packages/api-client` package is not used; the app keeps its own generated schema and typed fetch wrapper.
 
-API types are generated from the committed `schema.yml`; do not hand-write endpoint types.
+API types and the typed fetch wrapper come from the shared `@gym-hub/api-client` package, hosted in the backend repository's `api-client/` directory. Do not hand-write endpoint types. `src/api/client.ts` is a thin adapter that supplies `EXPO_PUBLIC_API_BASE_URL` and the SecureStore-backed refresh handler. Build the package before typechecking, testing, or starting the app; CI stages and builds it automatically.

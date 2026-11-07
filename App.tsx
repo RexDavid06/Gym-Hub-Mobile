@@ -14,7 +14,7 @@ import {
 } from 'react-native'
 
 import { apiFetch, buildApiPath } from './src/api/client'
-import type { components } from './src/api/schema'
+import type { components } from '@gym-hub/api-client'
 import { AuthProvider, useAuth } from './src/auth/AuthContext'
 import { BranchLine } from './src/branch/BranchLine'
 import { MemberMembershipSection } from './src/membership/MemberMembershipSection'
@@ -137,7 +137,7 @@ function TrainerHome({ profile, onLogout }: { profile: Profile; onLogout: () => 
     setMembers(null)
     setError('')
     try {
-      setMembers(await apiFetch<TrainerMember[]>('/api/me/members/', 'get'))
+      setMembers(await apiFetch('/api/me/members/', 'get'))
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Unable to load your members.')
     }
@@ -221,7 +221,7 @@ function TrainerMemberPlans({
     setPlans(null)
     setError('')
     try {
-      const rows = await apiFetch<WorkoutPlan[]>('/api/workout-plans/', 'get')
+      const rows = await apiFetch('/api/workout-plans/', 'get')
       setPlans(rows.filter((plan) => plan.member.id === member.id))
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Unable to load workout plans.')
@@ -259,7 +259,7 @@ function TrainerMemberPlans({
     setDeletingId(plan.id)
     setError('')
     try {
-      await apiFetch<void>(buildApiPath('/api/workout-plans/{id}/', { id: plan.id }), 'delete')
+      await apiFetch(buildApiPath('/api/workout-plans/{id}/', { id: plan.id }), 'delete')
       setPlans((current) => current?.filter((row) => row.id !== plan.id) ?? null)
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Unable to delete this plan.')
@@ -384,12 +384,10 @@ function WorkoutPlanForm({
     setError('')
     try {
       const result = plan
-        ? await apiFetch<WorkoutPlan>(
-            buildApiPath('/api/workout-plans/{id}/', { id: plan.id }),
-            'put',
-            payload,
-          )
-        : await apiFetch<WorkoutPlan>('/api/workout-plans/', 'post', payload)
+        ? await apiFetch(buildApiPath('/api/workout-plans/{id}/', { id: plan.id }), 'put', {
+            body: payload,
+          })
+        : await apiFetch('/api/workout-plans/', 'post', { body: payload })
       onSaved(result)
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Unable to save this plan.')
@@ -552,8 +550,8 @@ function MemberHome({ profile, onLogout }: { profile: Profile; onLogout: () => P
     setError('')
     try {
       const [trainer, planRows] = await Promise.all([
-        apiFetch<MemberTrainer>('/api/me/trainer/', 'get'),
-        apiFetch<WorkoutPlan[]>('/api/workout-plans/', 'get'),
+        apiFetch('/api/me/trainer/', 'get'),
+        apiFetch('/api/workout-plans/', 'get'),
       ])
       setAssignment(trainer)
       setPlans(planRows)

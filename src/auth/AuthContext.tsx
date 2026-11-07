@@ -1,8 +1,9 @@
 import * as SecureStore from 'expo-secure-store'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
+import type { components } from '@gym-hub/api-client'
+
 import { apiFetch, setAccessToken, setRefreshHandler } from '../api/client'
-import type { components } from '../api/schema'
 
 type Profile = components['schemas']['Me']
 type TokenPair = components['schemas']['TokenPair']
@@ -26,12 +27,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY)
     if (!refreshToken) return null
     try {
-      const result = await apiFetch<components['schemas']['TokenRefreshResponse'], { refresh: string }>(
-        '/api/token/refresh/',
-        'post',
-        { refresh: refreshToken },
-        false,
-      )
+      const result = await apiFetch('/api/token/refresh/', 'post', {
+        body: { refresh: refreshToken },
+        skipAuthRefresh: true,
+      })
       setAccessToken(result.access)
       await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, result.access)
       if (result.refresh) {
@@ -54,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const loadProfile = useCallback(async () => {
-    const result = await apiFetch<Profile>('/api/me/', 'get')
+    const result = await apiFetch('/api/me/', 'get')
     setProfile(result)
   }, [])
 
@@ -91,12 +90,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(
     async (phone: string, password: string) => {
-      const tokens = await apiFetch<TokenPair, { phone: string; password: string }>(
-        '/api/token/',
-        'post',
-        { phone, password },
-        false,
-      )
+      const tokens = await apiFetch('/api/token/', 'post', {
+        body: { phone, password },
+        skipAuthRefresh: true,
+      })
       await saveAndLoadProfile(tokens)
     },
     [saveAndLoadProfile],
@@ -104,12 +101,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const redeemInvite = useCallback(
     async (code: string, password: string) => {
-      const tokens = await apiFetch<TokenPair, { code: string; password: string }>(
-        '/api/auth/redeem-invite/',
-        'post',
-        { code, password },
-        false,
-      )
+      const tokens = await apiFetch('/api/auth/redeem-invite/', 'post', {
+        body: { code, password },
+        skipAuthRefresh: true,
+      })
       await saveAndLoadProfile(tokens)
     },
     [saveAndLoadProfile],
@@ -119,12 +114,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY)
     if (refreshToken) {
       try {
-        await apiFetch<undefined, { refresh: string }>(
-          '/api/auth/logout/',
-          'post',
-          { refresh: refreshToken },
-          false,
-        )
+        await apiFetch('/api/auth/logout/', 'post', {
+          body: { refresh: refreshToken },
+          skipAuthRefresh: true,
+        })
       } catch {
         // The token may already be expired or revoked; signing out locally still applies.
       }

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 
-import type { components } from '../api/schema'
+import type { components } from '@gym-hub/api-client'
 import { theme } from '../theme'
 import { formatMemberDate, formatNaira, methodLabel } from './format'
 

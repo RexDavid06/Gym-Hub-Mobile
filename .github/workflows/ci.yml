@@ -7,10 +7,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: RexDavid06/Gym-Hub-Backend-
+          path: backend-src
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: npm
+      - name: Stage and build the shared API client
+        run: |
+          mkdir -p ../packages
+          rm -rf ../packages/api-client
+          cp -r backend-src/api-client ../packages/api-client
+          cd ../packages/api-client
+          npm ci
+          npm run build
+      - name: Guard against local schema copies
+        run: |
+          test ! -f schema.yml
+          test ! -f src/api/schema.d.ts
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
